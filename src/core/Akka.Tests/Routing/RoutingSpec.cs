@@ -7,7 +7,6 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Routing;
 using Akka.TestKit;
@@ -65,26 +64,28 @@ namespace Akka.Tests.Routing
         public void Router_in_general_must_evict_terminated_routees()
         {
             var router = Sys.ActorOf(new RoundRobinPool(2).Props(Props.Create<Echo>()), "router");
-            router.Tell("",TestActor);
-            router.Tell("",TestActor);
+            router.Tell("", TestActor);
+            router.Tell("", TestActor);
+
             var c1 = ExpectMsg<IActorRef>();
             var c2 = ExpectMsg<IActorRef>();
+
             Watch(router);
             Watch(c2);
-            Sys.Stop(c2);
-            ExpectTerminated(c2).ExistenceConfirmed.ShouldBe(true);
-            // it might take a while until the Router has actually processed the Terminated message
-            Task.Delay(100).Wait();
-            AwaitCondition(() =>
-            {
-                router.Tell("", TestActor);
-                router.Tell("", TestActor);
-                var res = ReceiveWhile(TimeSpan.FromMilliseconds(100), o => o is IActorRef ? (IActorRef) o : ActorRefs.NoSender, 2);
-                return res.SequenceEqual(new[] {c1, c1});
-            });
-            
-            Sys.Stop(c1);
-            ExpectTerminated(router).ExistenceConfirmed.ShouldBe(true);
+
+            c2.Tell(PoisonPill.Instance);
+
+            ExpectMsg<Terminated>();
+
+            AwaitCondition(() => ((RoutedActorRef) router).Children.Count() == 1);
+
+            router.Tell("", TestActor);
+            var msg1 = ExpectMsg<IActorRef>();
+            msg1.ShouldBe(c1);
+
+            router.Tell("", TestActor);
+            var msg2 = ExpectMsg<IActorRef>();
+            msg2.ShouldBe(c1);
         }
 
         public class TestResizer : Resizer
@@ -287,6 +288,47 @@ namespace Akka.Tests.Routing
             updatedRouter.Routees.Count().ShouldBe(2);
             updatedRouter.Routees.Cast<ActorRefRoutee>().Any(r => ReferenceEquals(r.Actor, blackHole1)).ShouldBe(true);
             updatedRouter.Routees.Cast<ActorRefRoutee>().Any(r => ReferenceEquals(r.Actor, blackHole2)).ShouldBe(true);
+        }
+
+        public class RouterSupervisorSpec : AkkaSpec
+        {
+            #region Killable actor
+
+            private class KillableActor : ReceiveActor
+            {
+                private readonly IActorRef TestActor;
+
+                public KillableActor(IActorRef testActor)
+                {
+                    TestActor = testActor;
+                    Receive<string>(s => s == "go away", s => { throw new ArgumentException("Goodbye then!"); });
+                }
+            }
+
+            #endregion
+
+            #region Tests
+
+            [Fact]
+            public void Routers_must_use_provided_supervisor_strategy()
+            {
+                var router = Sys.ActorOf(Props.Create(() => new KillableActor(TestActor))
+                    .WithRouter(
+                        new RoundRobinPool(1, null, new AllForOneStrategy(
+                            exception =>
+                            {
+                                TestActor.Tell("supervised");
+                                return Directive.Stop;
+                            }),
+                            null)),
+                    "router1");
+
+                router.Tell("go away");
+
+                ExpectMsg("supervised", TimeSpan.FromSeconds(2));
+            }
+
+            #endregion
         }
     }
 }

@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using Akka.Actor;
 
 namespace Akka.DI.Core
@@ -27,13 +28,28 @@ namespace Akka.DI.Core
             system.RegisterExtension(DIExtension.DIExtensionProvider);
             DIExtension.DIExtensionProvider.Get(system).Initialize(dependencyResolver);
         }
-        
+
+        public static DIActorSystemAdapter DI(this ActorSystem system)
+        {
+            return new DIActorSystemAdapter(system);
+        }
 
         public static DIActorContextAdapter DI(this IActorContext context)
         {
             return new DIActorContextAdapter(context);
         }
 
+        public static Type GetTypeValue(this string typeName)
+        {
+            var firstTry = Type.GetType(typeName);
+            Func<Type> searchForType = () =>
+                AppDomain.CurrentDomain
+                    .GetAssemblies()
+                    .SelectMany(x => x.GetTypes())
+                    .FirstOrDefault(t => t.Name.Equals(typeName));
+            
+            return firstTry ?? searchForType();
+        }
     }
 }
 

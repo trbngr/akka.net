@@ -57,10 +57,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -70,6 +67,7 @@
     <Compile Include="..\..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ActorState.cs" />
     <Compile Include="Actor\ActorCell.DeathWatch.cs" />
     <Compile Include="Actor\ActorProducerPipeline.cs" />
     <Compile Include="Actor\ChildrenContainer\Internal\ChildrenContainer.cs" />
@@ -91,6 +89,7 @@
     <Compile Include="Actor\Internals\InternalSupportsTestFSMRef.cs" />
     <Compile Include="Actor\Internals\InitializableActor.cs" />
     <Compile Include="Actor\Scheduler\DateTimeNowTimeProvider.cs" />
+    <Compile Include="Actor\Scheduler\DedicatedThreadScheduler.cs" />
     <Compile Include="Actor\Scheduler\IDateTimeNowTimeProvider.cs" />
     <Compile Include="Actor\Scheduler\ITimeProvider.cs" />
     <Compile Include="Actor\Scheduler\DeprecatedSchedulerExtensions.cs" />
@@ -152,7 +151,6 @@
     <Compile Include="Actor\Stash\UntypedActorWithUnboundedStash.cs" />
     <Compile Include="Actor\Stash\IWithBoundedStash.cs" />
     <Compile Include="Actor\Stash\IWithUnboundedStash.cs" />
-    <Compile Include="Actor\Scheduler\TaskBasedScheduler.cs" />
     <Compile Include="Configuration\ConfigurationException.cs" />
     <Compile Include="Configuration\ConfigurationFactory.cs" />
     <Compile Include="Configuration\Config.cs" />
@@ -201,6 +199,7 @@
     <Compile Include="Actor\UntypedReceive.cs" />
     <Compile Include="Dispatch\Mailboxes.cs" />
     <Compile Include="Dispatch\MessageQueues\IMessageQueue.cs" />
+    <Compile Include="Dispatch\SingleThreadDispatcher.cs" />
     <Compile Include="Dispatch\SysMsg\ISystemMessage.cs" />
     <Compile Include="Dispatch\TaskDispatcher.cs" />
     <Compile Include="Dispatch\ThreadPoolBuilder.cs" />
@@ -218,6 +217,7 @@
     <Compile Include="Event\Error.cs" />
     <Compile Include="Event\EventBus.cs" />
     <Compile Include="Event\EventStream.cs" />
+    <Compile Include="Event\EventStreamExtensions.cs" />
     <Compile Include="Event\ILogMessageFormatter.cs" />
     <Compile Include="Event\Info.cs" />
     <Compile Include="Event\InitializeLogger.cs" />
@@ -232,8 +232,10 @@
     <Compile Include="Event\StandardOutLogger.cs" />
     <Compile Include="Helios.Concurrency.DedicatedThreadPool.cs" />
     <Compile Include="Routing\ConsistentHashRouter.cs" />
-    <Compile Include="Routing\TailChoppingPool.cs" />
+    <Compile Include="Serialization\JavaSerializer.cs" />
     <Compile Include="Util\ContinuousEnumerator.cs" />
+    <Compile Include="Util\Internal\Collections\EnumeratorExtensions.cs" />
+    <Compile Include="Util\Internal\Collections\Iterator.cs" />
     <Compile Include="Util\Internal\ImmutabilityUtils.cs" />
     <Compile Include="Util\Internal\InterlockedSpin.cs" />
     <Compile Include="Util\Internal\Collections\EmptyReadOnlyCollections.cs" />
@@ -246,7 +248,9 @@
     <Compile Include="Util\Internal\Collections\ImmutableAvlTreeMap.cs" />
     <Compile Include="Util\Internal\Collections\ImmutableTreeSet.cs" />
     <Compile Include="Util\Internal\StringBuilderExtensions.cs" />
+    <Compile Include="Util\Internal\TaskExtensions.cs" />
     <Compile Include="Util\ISurrogate.cs" />
+    <Compile Include="Util\MonotonicClock.cs" />
     <Compile Include="Util\StandardOutWriter.cs" />
     <Compile Include="Event\Subscription.cs" />
     <Compile Include="Event\TraceLogger.cs" />
@@ -295,6 +299,7 @@
     <Compile Include="PatternMatch.cs" />
     <Compile Include="Util\Resolver.cs" />
     <Compile Include="Util\ThreadLocalRandom.cs" />
+    <Compile Include="Util\Vector.cs" />
     <Compile Include="Util\WildcardTree.cs" />
     <Compile Include="Util\MatchHandler\Argument.cs" />
     <Compile Include="Util\MatchHandler\CachedMatchCompiler.cs" />

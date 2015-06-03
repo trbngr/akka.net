@@ -42,7 +42,7 @@ namespace Akka.Actor
     /// RepointableActorRef (and potentially others) may change their locality at
     /// runtime, meaning that isLocal might not be stable. RepointableActorRef has
     /// the feature that it starts out “not fully started” (but you can send to it),
-    /// which is why <see cref="IsSt"/> features here; it is not improbable that cluster
+    /// which is why <see cref="IsStarted"/> features here; it is not improbable that cluster
     /// actor refs will have the same behavior.
     /// INTERNAL
     /// </summary>
@@ -142,7 +142,8 @@ namespace Akka.Actor
         /// <summary>
         /// Forwards the message using the current Sender
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="receiver">The actor that receives the forward</param>
+        /// <param name="message">The message to forward</param>
         public static void Forward(this IActorRef receiver, object message)
         {
             var sender = ActorCell.GetCurrentSenderOrNoSender();
@@ -177,7 +178,10 @@ namespace Akka.Actor
 
         public void Tell(object message, IActorRef sender)
         {
-            if (sender == null) throw new ArgumentNullException("sender", "A sender must be specified");
+            if (sender == null)
+            {
+                sender = ActorRefs.NoSender;
+            }
 
             TellInternal(message, sender);
         }

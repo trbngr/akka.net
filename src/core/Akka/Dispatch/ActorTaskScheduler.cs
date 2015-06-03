@@ -15,12 +15,6 @@ using Akka.Dispatch.SysMsg;
 
 namespace Akka.Dispatch
 {
-    public enum AsyncBehavior
-    {
-        Reentrant,
-        Suspend
-    }
-
     public class AmbientState
     {
         public IActorRef Self { get; set; }
@@ -53,7 +47,8 @@ namespace Akka.Dispatch
 
         protected override void QueueTask(Task task)
         {
-            if (task.AsyncState == Outer)
+            var s = CallContext.LogicalGetData(StateKey) as AmbientState;
+            if (task.AsyncState == Outer || s == null)
             {
                 TryExecuteTask(task);
                 return;
@@ -61,10 +56,11 @@ namespace Akka.Dispatch
 
             //we get here if the task needs to be marshalled back to the mailbox
             //e.g. if previous task was an IO completion
-            var s = CallContext.LogicalGetData(StateKey) as AmbientState;
+            s = CallContext.LogicalGetData(StateKey) as AmbientState;
 
             s.Self.Tell(new CompleteTask(s, () =>
             {
+                SetCurrentState(s.Self,s.Sender,s.Message);
                 TryExecuteTask(task);
                 if (task.IsFaulted)
                     Rethrow(task, null);
@@ -83,8 +79,8 @@ namespace Akka.Dispatch
             //Is the current cell and the current state the same?
             if (cell != null &&
                 s != null &&
-                cell.Self == s.Self &&
-                cell.Sender == s.Sender &&
+                Equals(cell.Self, s.Self) &&
+                Equals(cell.Sender, s.Sender) &&
                 cell.CurrentMessage == s.Message)
             {
                 var res = TryExecuteTask(task);
@@ -94,24 +90,22 @@ namespace Akka.Dispatch
             return false;
         }
 
-        public static void RunTask(AsyncBehavior behavior, Action action)
+        public static void RunTask(Action action)
         {
-            RunTask(behavior, () =>
+            RunTask(() =>
             {
                 action();
                 return Task.FromResult(0);
             });
         }
 
-        public static void RunTask(AsyncBehavior behavior, Func<Task> action)
+        public static void RunTask(Func<Task> action)
         {
             var context = ActorCell.Current;
+            var mailbox = context.Mailbox;
 
-            //if reentrancy is not allowed, suspend user message processing
-            if (behavior == AsyncBehavior.Suspend)
-            {
-                context.SuspendReentrancy();
-            }
+            //suspend the mailbox
+            mailbox.Suspend(MailboxSuspendStatus.AwaitingTask);
 
             SetCurrentState(context.Self, context.Sender, null);
 
@@ -130,13 +124,10 @@ namespace Akka.Dispatch
                     .ContinueWith(
                         Rethrow,
                         Faulted,
-                        TaskContinuationOptions.OnlyOnFaulted);
+                        TaskContinuationOptions.None);
 
-                //if reentrancy was suspended, make sure we re-enable message processing again
-                if (behavior == AsyncBehavior.Suspend)
-                {
-                    context.ResumeReentrancy();
-                }
+                //if mailbox was suspended, make sure we re-enable message processing again
+                mailbox.Resume(MailboxSuspendStatus.AwaitingTask);
             },
                 Outer,
                 CancellationToken.None,

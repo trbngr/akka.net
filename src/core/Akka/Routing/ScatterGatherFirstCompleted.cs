@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Configuration;
-using Akka.Dispatch;
 using Akka.Util;
 
 namespace Akka.Routing
@@ -180,6 +179,15 @@ namespace Akka.Routing
         public ScatterGatherFirstCompletedPool(int nrOfInstances, Resizer resizer, SupervisorStrategy supervisorStrategy,
             string routerDispatcher,TimeSpan within, bool usePoolDispatcher = false)
             : base(nrOfInstances, resizer, supervisorStrategy, routerDispatcher, usePoolDispatcher)
+        {
+            _within = within;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="nrOfInstances">The nr of instances.</param>
+        /// <param name="within">Expect a response within the given timespan</param>
+        public ScatterGatherFirstCompletedPool(int nrOfInstances, TimeSpan within) : this(nrOfInstances)
         {
             _within = within;
         }

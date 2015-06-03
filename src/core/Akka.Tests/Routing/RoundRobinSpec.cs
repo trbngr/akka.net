@@ -62,6 +62,17 @@ namespace Akka.Tests.Routing
             Sys.Stop(router);
             testLatch.Ready(TimeSpan.FromSeconds(5));
         }
+
+        [Fact]
+        public void RoundRobin_should_not_throw_IndexOutOfRangeException_when_counter_wraps_to_be_negative()
+        {
+            var routees = new[] {Routee.NoRoutee, Routee.NoRoutee, Routee.NoRoutee};
+            var routingLogic = new RoundRobinRoutingLogic(int.MaxValue - 5);
+            for (var i = 0; i < 10; i++)
+            {
+                routingLogic.Select(i, routees);
+            }
+        }
     }
 }
 

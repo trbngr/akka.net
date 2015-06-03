@@ -6,25 +6,23 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Akka.DI.Core;
 using Akka.DI.Unity;
 using Akka.Routing;
 using Microsoft.Practices.Unity;
 
 namespace BasicUnityUses
 {
-	class Program
-	{
-		static void Main(string[] args)
-		{
-			WithHashPool();
-		}
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            WithHashPool();
+        }
 
-		private static void WithHashPool()
+        private static void WithHashPool()
         {
             IUnityContainer container = new UnityContainer();
             container.RegisterType<TypedWorker>();
@@ -35,7 +33,7 @@ namespace BasicUnityUses
                 var propsResolver =
                     new UnityDependencyResolver(container, system);
 
-                var router = system.ActorOf(propsResolver.Create<TypedWorker>().WithRouter(FromConfig.Instance), "router1");
+                var router = system.ActorOf(system.DI().Props<TypedWorker>().WithRouter(FromConfig.Instance), "router1");
 
                 Task.Delay(500).Wait();
                 Console.WriteLine("Sending Messages");
@@ -55,11 +53,12 @@ namespace BasicUnityUses
 
                     }
                 }
+                Console.WriteLine("Hit Enter to exit");
+                Console.ReadLine();
             }
 
 
-            Console.ReadLine();
         }
-	}
+    }
 }
 

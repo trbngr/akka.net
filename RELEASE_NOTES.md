@@ -1,3 +1,92 @@
+#### 1.0.2 June 2 2015
+**Bugfix release for Akka.NET v1.0.1.**
+
+Fixes & Changes - Akka.NET Core
+* [Routers seem ignore supervision strategy](https://github.com/akkadotnet/akka.net/issues/996)
+* [Replaced DateTime.Now with DateTime.UtcNow/MonotonicClock](https://github.com/akkadotnet/akka.net/pull/1009)
+* [DedicatedThreadScheduler](https://github.com/akkadotnet/akka.net/pull/1002)
+* [Add ability to specify scheduler implementation in configuration](https://github.com/akkadotnet/akka.net/pull/994)
+* [Added generic extensions to EventStream subscribe/unsubscribe.](https://github.com/akkadotnet/akka.net/pull/990)
+* [Convert null to NoSender.](https://github.com/akkadotnet/akka.net/pull/993)
+* [Supervisor strategy bad timeouts](https://github.com/akkadotnet/akka.net/pull/986)
+* [Updated Pigeon.conf throughput values](https://github.com/akkadotnet/akka.net/pull/980)
+* [Add PipeTo for non-generic Tasks for exception handling](https://github.com/akkadotnet/akka.net/pull/978)
+
+Fixes & Changes - Akka.NET Dependency Injection
+* [Added Extensions methods to ActorSystem and ActorContext to make DI more accessible](https://github.com/akkadotnet/akka.net/pull/966)
+* [DIActorProducer fixes](https://github.com/akkadotnet/akka.net/pull/961)
+* [closes akkadotnet/akka.net#1020 structuremap dependency injection](https://github.com/akkadotnet/akka.net/pull/1021)
+
+Fixes & Changes - Akka.Remote and Akka.Cluster
+* [Fixing up cluster rejoin behavior](https://github.com/akkadotnet/akka.net/pull/962)
+* [Added dispatcher fixes for remote and cluster ](https://github.com/akkadotnet/akka.net/pull/983)
+* [Fixes to ClusterRouterGroup](https://github.com/akkadotnet/akka.net/pull/953)
+* [Two actors are created by remote deploy using Props.WithDeploy](https://github.com/akkadotnet/akka.net/issues/1025)
+
+Fixes & Changes - Akka.Persistence
+* [Renamed GuaranteedDelivery classes to AtLeastOnceDelivery](https://github.com/akkadotnet/akka.net/pull/984)
+* [Changes in Akka.Persistence SQL backend](https://github.com/akkadotnet/akka.net/pull/963)
+* [PostgreSQL persistence plugin for both event journal and snapshot store](https://github.com/akkadotnet/akka.net/pull/971)
+* [Cassandra persistence plugin](https://github.com/akkadotnet/akka.net/pull/995)
+
+**New Features:**
+
+**Akka.TestKit.XUnit2**
+Akka.NET now has support for [XUnit 2.0](http://xunit.github.io/)! You can install Akka.TestKit.XUnit2 via the NuGet commandline:
+
+```
+PM> Install-Package Akka.TestKit.XUnit2
+```
+
+**Akka.Persistence.PostgreSql** and **Akka.Persistence.Cassandra**
+Akka.Persistence now has two additional concrete implementations for PostgreSQL and Cassandra! You can install either of the packages using the following commandline:
+
+[Akka.Persistence.PostgreSql Configuration Docs](https://github.com/akkadotnet/akka.net/tree/dev/src/contrib/persistence/Akka.Persistence.PostgreSql)
+```
+PM> Install-Package Akka.Persistence.PostgreSql
+```
+
+[Akka.Persistence.Cassandra Configuration Docs](https://github.com/akkadotnet/akka.net/tree/dev/src/contrib/persistence/Akka.Persistence.Cassandra)
+```
+PM> Install-Package Akka.Persistence.Cassandra
+```
+
+**Akka.DI.StructureMap**
+Akka.NET's dependency injection system now supports [StructureMap](http://structuremap.github.io/)! You can install Akka.DI.StructureMap via the NuGet commandline:
+
+```
+PM> Install-Package Akka.DI.StructureMap
+```
+
+#### 1.0.1 Apr 28 2015
+
+**Bugfix release for Akka.NET v1.0.**
+
+Fixes:
+* [v1.0 F# scheduling API not sending any scheduled messages](https://github.com/akkadotnet/akka.net/issues/831)
+* [PinnedDispatcher - uses single thread for all actors instead of creating persanal thread for every actor](https://github.com/akkadotnet/akka.net/issues/850)
+* [Hotfix async await when awaiting IO completion port based tasks](https://github.com/akkadotnet/akka.net/pull/843)
+* [Fix for async await suspend-resume mechanics](https://github.com/akkadotnet/akka.net/pull/836)
+* [Nested Ask async await causes null-pointer exception in ActorTaskScheduler](https://github.com/akkadotnet/akka.net/issues/855)
+* [Akka.Remote: can't reply back remotely to child of Pool router](https://github.com/akkadotnet/akka.net/issues/884)
+* [Context.DI().ActorOf shouldn't require a parameterless constructor](https://github.com/akkadotnet/akka.net/issues/832)
+* [DIActorContextAdapter uses typeof().Name instead of AssemblyQualifiedName](https://github.com/akkadotnet/akka.net/issues/833)
+* [IndexOutOfRangeException with RoundRobinRoutingLogic & SmallestMailboxRoutingLogic](https://github.com/akkadotnet/akka.net/issues/908)
+
+New Features:
+
+**Akka.TestKit.NUnit**
+Akka.NET now has support for [NUnit ](http://nunit.org/) inside its TestKit. You can install Akka.TestKit.NUnit via the NuGet commandline:
+
+```
+PM> Install-Package Akka.TestKit.NUnit
+```
+
+**Akka.Persistence.SqlServer**
+The first full implementation of Akka.Persistence is now available for SQL Server.
+
+[Read the full instructions for working with Akka.Persistence.SQLServer here](https://github.com/akkadotnet/akka.net/tree/dev/src/contrib/persistence/Akka.Persistence.SqlServer).
+
 #### 1.0.0 Apr 09 2015
 
 **Akka.NET is officially no longer in beta status**. The APIs introduced in Akka.NET v1.0 will enjoy long-term support from the Akka.NET development team and all of its professional support partners.

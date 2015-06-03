@@ -12,6 +12,7 @@ using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using System;
 using System.Threading.Tasks;
+using Akka.DI.Core;
 
 namespace BasicCastleWindsorUse
 {
@@ -33,7 +34,7 @@ namespace BasicCastleWindsorUse
                 var propsResolver =
                     new WindsorDependencyResolver(container, system);
 
-                var router = system.ActorOf(propsResolver.Create<TypedWorker>().WithRouter(FromConfig.Instance), "router1");
+                var router = system.ActorOf(system.DI().Props<TypedWorker>().WithRouter(FromConfig.Instance), "router1");
 
                 Task.Delay(500).Wait();
                 Console.WriteLine("Sending Messages");
@@ -52,9 +53,11 @@ namespace BasicCastleWindsorUse
 
                     }
                 }
+                Console.WriteLine("Hit Enter to exit");
+                Console.ReadLine();
             }
 
-            Console.ReadLine();
+            
         }
     }
 }
